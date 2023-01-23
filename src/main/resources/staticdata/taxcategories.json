@@ -1,0 +1,22 @@
+[
+	{
+		"name": "basicsalesexcemted",
+		"taxpers": "10",
+		"excemptpers": "100"
+	},
+	{
+		"name": "basicsales",
+		"taxpers": "10",
+		"excemptpers": "0"
+	},
+	{
+		"name": "additionalsalesexcempted",
+		"taxpers": "5",
+		"excemptpers": "100"
+	},
+	{
+		"name": "additionalsales",
+		"taxpers": "5",
+		"excemptpers": "0"
+	}
+]

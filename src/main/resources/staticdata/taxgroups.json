@@ -1,0 +1,14 @@
+[
+	{
+		"name": "sales_w_o_excempt",
+		"taxCategories" : [
+			"basicsales","additionalsales"
+		]
+	},
+	{
+		"name": "sales_with_excempt",
+		"taxCategories" : [
+			"basicsalesexcemted","additionalsales"
+		]
+	}
+]
