@@ -1,0 +1,28 @@
+{
+  "goods": [
+    {
+      "name": "book",
+      "goodcategory": "bookcategory"
+    },
+    {
+      "name": "food",
+      "goodcategory": "foodcategory"
+    },
+    {
+      "name": "medical",
+      "goodcategory": "medicalcategory"
+    },
+    {
+      "name": "music",
+      "goodcategory": "musiccategory"
+    },
+    {
+      "name": "sweets",
+      "goodcategory": "chocolatecategory"
+    },
+    {
+      "name": "perfume",
+      "goodcategory": "perfumcategory"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.quarkus.workshop.superheroes.hero.HeroResourceTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 59.052 s - in io.quarkus.workshop.superheroes.hero.HeroResourceTest

@@ -1,0 +1,16 @@
+package com.itemis.codechallenge.invoice;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+public class GoodCategory {
+	
+	@NotNull
+	public String name;
+	
+	@NotNull
+    @Pattern(regexp = "bookcategory|foodcategory|medicalcategory|musiccategory|chocolatecategory|perfumcategory", flags = Pattern.Flag.CASE_INSENSITIVE)
+	public String taxGroup;
+	
+}
+ 	
