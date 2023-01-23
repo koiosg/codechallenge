@@ -1,0 +1,26 @@
+ [
+	{
+		"name": "bookcategory",
+		"taxGroup": "sales_with_excempt"
+	},
+	{
+		"name": "foodcategory",
+		"taxGroup": "sales_with_excempt"
+	},
+	{
+		"name": "medicalcategory",
+		"taxGroup": "sales_with_excempt"
+	},
+	{
+		"name": "musiccategory",
+		"taxGroup": "sales_w_o_excempt"
+	},
+	{
+		"name": "chocolatecategory",
+		"taxGroup": "sales_w_o_excempt"
+	},
+	{
+		"name": "perfumcategory",
+		"taxGroup": "sales_w_o_excempt"
+	}
+]
