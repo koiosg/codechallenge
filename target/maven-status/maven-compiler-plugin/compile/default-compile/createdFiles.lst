@@ -1,6 +1,0 @@
-io\quarkus\workshop\superheroes\hero\Hero.class
-io\quarkus\workshop\superheroes\hero\HeroResource.class
-io\quarkus\workshop\superheroes\hero\HeroService.class
-META-INF\panache-archive.marker
-io\quarkus\workshop\superheroes\hero\HeroApplication.class
-io\quarkus\workshop\superheroes\hero\HeroApplicationLifeCycle.class
