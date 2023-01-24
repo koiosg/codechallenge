@@ -23,7 +23,6 @@ public class Good {
 	@Min(0)
 	public Integer quantity;
 	
-	@NotNull
     @Pattern(regexp = "box|bottle|packet", flags = Pattern.Flag.CASE_INSENSITIVE)
 	public String unitOfMeasurement;
 	
