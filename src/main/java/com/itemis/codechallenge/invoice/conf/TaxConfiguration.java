@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonParseException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonMappingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,9 +16,10 @@ import com.itemis.codechallenge.invoice.entity.GoodCategory;
 import com.itemis.codechallenge.invoice.entity.TaxCategory;
 import com.itemis.codechallenge.invoice.entity.TaxGroup;
 
+@ApplicationScoped
 public class TaxConfiguration {
 
-	public static List<TaxGroup> getTaxGroups() throws JsonParseException, JsonMappingException, IOException {
+	public List<TaxGroup> getTaxGroups() throws JsonParseException, JsonMappingException, IOException {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/taxgroups.json")) {
@@ -26,7 +29,7 @@ public class TaxConfiguration {
 		}
 	}
 	
-	public static List<TaxCategory> getTaxCategories() throws JsonParseException, JsonMappingException, IOException {
+	public List<TaxCategory> getTaxCategories() throws JsonParseException, JsonMappingException, IOException {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/taxcategories.json")) {
@@ -36,7 +39,7 @@ public class TaxConfiguration {
 		}
 	}
 	
-	public static List<GoodCategory> getGoodsCategories() throws JsonParseException, JsonMappingException, IOException {
+	public List<GoodCategory> getGoodsCategories() throws JsonParseException, JsonMappingException, IOException {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/goodscategories.json")) {
@@ -46,7 +49,7 @@ public class TaxConfiguration {
 		}
 	}
 	
-	public static List<Good> getGoods() throws JsonParseException, JsonMappingException, IOException {
+	public List<Good> getGoods() throws JsonParseException, JsonMappingException, IOException {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/goods.json")) {
