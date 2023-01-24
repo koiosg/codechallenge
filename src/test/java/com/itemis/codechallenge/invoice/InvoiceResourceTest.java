@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
@@ -30,7 +31,6 @@ public class InvoiceResourceTest {
     @Test
     void shouldNotReturnInvalidInvoiceData() {
         Basket basket = new Basket();
-
         given()
             .body(basket)
             .header(CONTENT_TYPE, APPLICATION_JSON)
@@ -45,7 +45,7 @@ public class InvoiceResourceTest {
     void shouldPingOpenAPI() {
         given()
             .header(ACCEPT, APPLICATION_JSON)
-            .when().get("/openapi")
+            .when().get("/q/openapi")
             .then()
             .statusCode(OK.getStatusCode());
     }
@@ -53,7 +53,7 @@ public class InvoiceResourceTest {
     @Test
     void shouldPingSwaggerUI() {
         given()
-            .when().get("/swagger-ui")
+            .when().get("/q/swagger-ui")
             .then()
             .statusCode(OK.getStatusCode());
     }
@@ -61,7 +61,7 @@ public class InvoiceResourceTest {
     @Test
     void shouldPingLiveness() {
         given()
-            .when().get("/health/live")
+            .when().get("/q/health/live")
             .then()
             .statusCode(OK.getStatusCode());
     }
@@ -69,7 +69,7 @@ public class InvoiceResourceTest {
     @Test
     void shouldPingReadiness() {
         given()
-            .when().get("/health/ready")
+            .when().get("/q/health/ready")
             .then()
             .statusCode(OK.getStatusCode());
     }
@@ -77,8 +77,8 @@ public class InvoiceResourceTest {
     @Test
     void shouldPingMetrics() {
         given()
-            .header(ACCEPT, APPLICATION_JSON)
-            .when().get("/metrics/application")
+            .header(ACCEPT, TEXT_PLAIN)
+            .when().get("/q/metrics")
             .then()
             .statusCode(OK.getStatusCode());
     }
