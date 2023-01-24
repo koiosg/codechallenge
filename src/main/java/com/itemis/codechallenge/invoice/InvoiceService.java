@@ -7,8 +7,7 @@ import javax.validation.Valid;
 public class InvoiceService {
 	
     public Invoice getInvoice(@Valid Basket basket) {
-        Invoice inv = this.calculate(basket);
-        return inv;
+        return new Invoice().buildInvoiceItems(basket).buildSalesTax().buildTotal();
     }
 
 	private Invoice calculate(@Valid Basket invoice) {

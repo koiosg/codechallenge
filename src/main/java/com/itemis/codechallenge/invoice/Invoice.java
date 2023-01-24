@@ -1,8 +1,68 @@
 package com.itemis.codechallenge.invoice;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+
 public class Invoice {
-		
-	public String toString() {
-		return null;
+	public List<InvoiceItem> getInvoiceItems() {
+		return invoiceItems;
 	}
+
+	public void setInvoiceItems(final List<InvoiceItem> invoiceItems) {
+		this.invoiceItems = invoiceItems;
+	}
+	
+	public Invoice buildInvoiceItems(final Basket basket) {
+		final ArrayList<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
+		basket.getGoods().parallelStream().forEach(good -> invoiceItems.add(new InvoiceItem().buildQuantity(good.quantity).
+				buildLineItemDescription(good.isImported, good.unitOfMeasurement, good.name).buildLineItemBasicTax(good.goodCategory, good.costPerLineItem)));
+		this.setInvoiceItems(invoiceItems);
+		return this;
+	}
+
+	public BigDecimal getSalesTax() {
+		return salesTax;
+	}
+
+	public void setSalesTax(final BigDecimal salesTax) {
+		this.salesTax = salesTax;
+	}
+	
+	public Invoice buildSalesTax() {
+		invoiceItems.parallelStream().forEach(x -> x.setLineItemPrice(x.getLineItemPrice().add
+				(x.getLineItemBasicTax().add(x.getLineItemImportTax()), new MathContext(2, RoundingMode.HALF_EVEN)))); 
+		return this;
+	}
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(final BigDecimal total) {
+		this.total = total;
+	}
+	
+	public Invoice buildTotal() {
+		setTotal(invoiceItems.parallelStream().map(x->x.getLineItemPrice()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_EVEN));
+		return this;
+	}
+
+	private List<InvoiceItem> invoiceItems;
+	
+	@NotNull
+	@DecimalMin(value = "0.0", inclusive = true)
+    @Digits(integer=3, fraction=2)
+	private BigDecimal salesTax;
+	
+	@NotNull
+	@DecimalMin(value = "0.0", inclusive = true)
+    @Digits(integer=3, fraction=2)
+	private BigDecimal total;
 }

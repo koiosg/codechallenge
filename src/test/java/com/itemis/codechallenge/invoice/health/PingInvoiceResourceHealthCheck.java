@@ -11,7 +11,7 @@ import com.itemis.codechallenge.invoice.InvoiceResource;
 
 @Liveness
 @ApplicationScoped
-public class PingFightResourceHealthCheck implements HealthCheck {
+public class PingInvoiceResourceHealthCheck implements HealthCheck {
 
 	@Inject
 	InvoiceResource invoiceResource; 

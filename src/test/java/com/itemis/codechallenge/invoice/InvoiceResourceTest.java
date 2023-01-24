@@ -5,13 +5,17 @@ import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
+
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import com.itemis.codechallenge.invoice.entity.Good;
 
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -29,16 +33,31 @@ public class InvoiceResourceTest {
     }
 
     @Test
-    void shouldNotReturnInvalidInvoiceData() {
-        Basket basket = new Basket();
+    void shouldNotSendInvalidBasketData() {
+        Basket emptyBasket = new Basket();
+        emptyBasket.setGoods(null);
         given()
-            .body(basket)
+            .body(emptyBasket)
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .header(ACCEPT, APPLICATION_JSON)
             .when()
-            .post("/api/invoice")
+            .get("/api/invoice")
             .then()
-            .statusCode(NOT_FOUND.getStatusCode());
+            .statusCode(BAD_REQUEST.getStatusCode());
+    }
+    
+    @Test
+    void shouldSendValidEmptyBasketData() {
+        Basket emptyBasket = new Basket();
+        emptyBasket.setGoods(new ArrayList<Good>());
+        given()
+            .body(emptyBasket)
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header(ACCEPT, APPLICATION_JSON)
+            .when()
+            .get("/api/invoice")
+            .then()
+            .statusCode(OK.getStatusCode());
     }
 
     @Test

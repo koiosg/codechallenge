@@ -6,7 +6,7 @@ import javax.validation.constraints.Pattern;
 public class GoodCategory {
 
 	@NotNull
-    @Pattern(regexp = "bookcategory|foodcategory|medicalcategory|musiccategory|chocolatecategory|perfumcategory", flags = Pattern.Flag.CASE_INSENSITIVE)
+    @Pattern(regexp = "bookcategory|foodcategory|medicalcategory|musiccategory|perfumcategory", flags = Pattern.Flag.CASE_INSENSITIVE)
 	public String name;
 	
 	@NotNull

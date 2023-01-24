@@ -9,7 +9,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -33,9 +32,6 @@ public class InvoiceResource {
     public Response getInvoice(
         @RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = Basket.class)))
         @Valid Basket basket) {
-//    	if (null == basket.getGoods()) {
-//    		return Response.ok(Status.NO_CONTENT).build();
-//    	}
         Invoice invoice = service.getInvoice(basket);
         LOGGER.debug("Invoice fetched for a basket " + basket);
         return Response.ok(invoice).build();
