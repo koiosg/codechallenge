@@ -1,7 +1,6 @@
 package com.itemis.codechallenge.invoice;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +20,10 @@ public class Invoice {
 	
 	public Invoice buildInvoiceItems(final Basket basket) {
 		final ArrayList<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
-		basket.getGoods().parallelStream().forEach(good -> invoiceItems.add(new InvoiceItem().buildQuantity(good.quantity).
-				buildLineItemDescription(good.isImported, good.unitOfMeasurement, good.name).buildLineItemBasicTax(good.goodCategory, good.costPerLineItem)));
+		basket.getGoods().parallelStream().forEach(good -> {
+				invoiceItems.add(new InvoiceItem().buildQuantity(good.quantity).
+						buildLineItemDescription(good.isImported, good.unitOfMeasurement, good.name).buildLineItemBasicAndAdditionalTax(good.goodCategory, good.costPerLineItem, good.isImported).buildLineItemPrice(good.costPerLineItem));
+		});
 		this.setInvoiceItems(invoiceItems);
 		return this;
 	}
@@ -36,8 +37,9 @@ public class Invoice {
 	}
 	
 	public Invoice buildSalesTax() {
-		invoiceItems.parallelStream().forEach(x -> x.setLineItemPrice(x.getLineItemPrice().add
-				(x.getLineItemBasicTax().add(x.getLineItemImportTax()), new MathContext(2, RoundingMode.HALF_EVEN)))); 
+		final List<BigDecimal> lineItemTaxAmounts = new ArrayList<BigDecimal>();
+		invoiceItems.parallelStream().forEach(invoiceItem-> lineItemTaxAmounts.add(invoiceItem.getLineItemBasicTax().add(invoiceItem.getLineItemImportTax()))); 
+		setSalesTax(lineItemTaxAmounts.parallelStream().reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_EVEN));
 		return this;
 	}
 

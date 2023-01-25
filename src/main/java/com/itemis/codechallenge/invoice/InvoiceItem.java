@@ -1,26 +1,29 @@
 package com.itemis.codechallenge.invoice;
 
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 
-import javax.inject.Inject;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonParseException;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonMappingException;
-
 import com.itemis.codechallenge.invoice.conf.TaxConfiguration;
 import com.itemis.codechallenge.invoice.entity.TaxCategory;
-import com.itemis.codechallenge.invoice.entity.TaxGroup;
 
 public class InvoiceItem {
 	
-    @Inject
-    TaxConfiguration taxConfiguration;
-
+	private static TaxConfiguration taxConfiguration;
+	
+	InvoiceItem() {
+		if (null == taxConfiguration) {
+			taxConfiguration = new TaxConfiguration();
+		}
+	}
+	
+	private static final String IMPORTED_CATEGORY_SUFFIX = "_import";
+	
 	public Integer getQuantity() {
 		return quantity;
 	}
@@ -42,8 +45,8 @@ public class InvoiceItem {
 		this.lineItemPrice = lineItemPrice;
 	}
 
-	public InvoiceItem buildLineItemPrice(final BigDecimal lineItemPrice) {
-		this.lineItemPrice = lineItemPrice;
+	public InvoiceItem buildLineItemPrice(final BigDecimal costPerLineItem) {
+		this.lineItemPrice = costPerLineItem.add(this.lineItemBasicTax).add(this.lineItemImportTax).setScale(2, RoundingMode.HALF_EVEN);
 		return this;
 	}
 	
@@ -63,7 +66,7 @@ public class InvoiceItem {
 		if (null != unitOfMeasurement) {
 			this.lineItemDescription = this.getLineItemDescription().concat(unitOfMeasurement).concat(" of");
 		}
-		this.lineItemDescription = this.getLineItemDescription().concat(" ").concat(goodName);
+		this.lineItemDescription = this.getLineItemDescription().concat(" ").concat(goodName).concat(": ");
 		return this;
 	}
 	
@@ -75,23 +78,32 @@ public class InvoiceItem {
 		this.lineItemBasicTax = lineItemBasicTax;
 	}
 
-	public InvoiceItem buildLineItemBasicTax(final String goodCategory, final BigDecimal costPerLineItem) throws JsonParseException, JsonMappingException, IOException {
-		final TaxGroup taxGroup = taxConfiguration.getTaxGroups().stream().filter(taxConf -> taxConf.getName().equals(taxConfiguration.getGoodsCategories().stream().filter(x->x.name.equals(goodCategory)).findFirst().get().taxGroup)).findFirst().get();
-		TaxCategory taxCategory = taxConfiguration.getTaxCategories().stream().filter(x->x.getName().equals(taxGroup.getTaxCategories().get(0))).findFirst().get();
-		final BigDecimal taxPersPerCategory = taxCategory.getExcemptpers().longValueExact() > 0 ? 
-				taxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).multiply(taxCategory.getExcemptpers().divide(BigDecimal.valueOf(100))) : taxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
-		this.lineItemBasicTax = costPerLineItem.multiply(taxPersPerCategory);
-		return this;
-	}
-	
 	public BigDecimal getLineItemImportTax() {
 		return lineItemImportTax;
 	}
 
-	public void setLineItemImportTax(final BigDecimal lineItemImportTax) {
+	public void setLineItemImportTax(BigDecimal lineItemImportTax) {
 		this.lineItemImportTax = lineItemImportTax;
 	}
 
+	public InvoiceItem buildLineItemBasicAndAdditionalTax(final String goodCategory, final BigDecimal costPerLineItem, final Boolean isImported) {
+		final String taxGroupName = taxConfiguration.
+				getGoodCategories().stream().filter
+				(x->x.name.equals(isImported ? goodCategory.concat(IMPORTED_CATEGORY_SUFFIX) : goodCategory)).findFirst().get().taxGroup;
+		final List<String> taxCategoriesPerGroup = taxConfiguration.getTaxGroups().stream().filter(taxConf -> taxConf.getName().equals(taxGroupName)).findFirst().get().getTaxCategories();
+		final String basicTaxCategoryName = taxCategoriesPerGroup.get(0);
+		TaxCategory basicTaxCategory = taxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(basicTaxCategoryName)).findFirst().get();
+		final BigDecimal basicTaxPersPerCategory = 0 < basicTaxCategory.getExcemptpers().longValueExact() ? 
+				basicTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).add(basicTaxCategory.getTaxpers().divide(basicTaxCategory.getExcemptpers()).negate()) : basicTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
+		this.lineItemBasicTax = costPerLineItem.multiply(basicTaxPersPerCategory);
+		final String additionalTaxCategoryName = taxCategoriesPerGroup.get(1);
+		TaxCategory additionalTaxCategory = taxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(additionalTaxCategoryName)).findFirst().get();
+		final BigDecimal additionalTaxPersPerCategory = 0 < additionalTaxCategory.getExcemptpers().longValueExact() ? 
+				additionalTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).add(additionalTaxCategory.getTaxpers().divide(additionalTaxCategory.getExcemptpers()).negate()) : additionalTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
+		this.lineItemImportTax = costPerLineItem.multiply(additionalTaxPersPerCategory);
+		return this;
+	}
+	
 	@NotNull
 	@Min(0)
 	private Integer quantity;
@@ -111,5 +123,5 @@ public class InvoiceItem {
     @Digits(integer=3, fraction=2)
 	private BigDecimal lineItemPrice;
 	
-	private String lineItemDescription;
+	private String lineItemDescription = "";
 }

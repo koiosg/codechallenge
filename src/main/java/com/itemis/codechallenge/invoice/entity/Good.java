@@ -17,7 +17,8 @@ public class Good {
     @Pattern(regexp = "bookcategory|foodcategory|medicalcategory|musiccategory|perfumcategory", flags = Pattern.Flag.CASE_INSENSITIVE)
 	public String goodCategory;
 	
-	public Boolean isImported;
+	// default value is FALSE
+	public Boolean isImported = Boolean.FALSE;
 	
 	@NotNull
 	@Min(0)

@@ -1,12 +1,14 @@
 package com.itemis.codechallenge.invoice;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -37,8 +39,8 @@ public class InvoiceConfigurationTest {
     @Inject
     Validator validator;
     
-    @Inject
-    TaxConfiguration taxConfiguration;
+	@Inject
+	TaxConfiguration taxConfiguration;
 
     @Test
     public void testGoodCreationNOK() {
@@ -56,6 +58,8 @@ public class InvoiceConfigurationTest {
     	final Good good= new Good();
     	good.name = "eqwqtwqt";
     	good.goodCategory = "bookcategory";
+    	good.quantity = 1;
+    	good.costPerLineItem = BigDecimal.ONE;
         Set<ConstraintViolation<Good>> violations = validator.validate(good);
         assertTrue(violations.isEmpty());
     }
@@ -107,9 +111,10 @@ public class InvoiceConfigurationTest {
     @Test
     public void goodsCategoriesTestOK() throws JsonParseException, JsonMappingException, IOException {
     	// creating a tax group
-    	final List<GoodCategory> goodCategories = taxConfiguration.getGoodsCategories();
+    	final List<GoodCategory> goodCategories = taxConfiguration.getGoodCategories();
         assertNotNull(goodCategories);
-        assertTrue(0 < goodCategories.size());
+        assertTrue(1 < goodCategories.size());
+        
     }
     
     @Test
@@ -124,14 +129,25 @@ public class InvoiceConfigurationTest {
     public void testBasketCreationNOK() {
     	// creating a basket
     	final Basket emptyBasket = new Basket();
-        assertNull(emptyBasket.getGoods());
+        assertEquals(emptyBasket.getGoods().size(), 0);
     }
 
     @Test
     public void testBasketCreationOK() {
     	// creating a basket
     	final Basket basket = new Basket();
-    	basket.setGoods(new ArrayList<Good>());
         assertNotNull(basket.getGoods());
+    }
+    
+    @Test
+    void testNonEmptyBasketOk() throws IOException {
+    	Good good= new Good();
+    	good.name = "book";
+    	good.goodCategory = "bookcategory";
+    	good.quantity = 1;
+    	good.costPerLineItem = BigDecimal.TEN;
+        Basket basket = new Basket();
+        basket.setGoods(Arrays.asList(new Good[] {good}));
+        InvoiceService.getInvoice(basket);
     }
 }

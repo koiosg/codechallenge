@@ -9,7 +9,8 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,6 @@ public class InvoiceResourceTest {
     @Test
     void shouldNotSendInvalidBasketData() {
         Basket emptyBasket = new Basket();
-        emptyBasket.setGoods(null);
         given()
             .body(emptyBasket)
             .header(CONTENT_TYPE, APPLICATION_JSON)
@@ -47,9 +47,8 @@ public class InvoiceResourceTest {
     }
     
     @Test
-    void shouldSendValidEmptyBasketData() {
+    void shouldSendValidEmptyBasketDataNOK() {
         Basket emptyBasket = new Basket();
-        emptyBasket.setGoods(new ArrayList<Good>());
         given()
             .body(emptyBasket)
             .header(CONTENT_TYPE, APPLICATION_JSON)
@@ -57,8 +56,30 @@ public class InvoiceResourceTest {
             .when()
             .get("/api/invoice")
             .then()
-            .statusCode(OK.getStatusCode());
+            .statusCode(BAD_REQUEST.getStatusCode());
     }
+    
+    @Test
+    void shouldSendValidNonEmptyBasketData() {
+    	Good good= new Good();
+    	good.name = "book";
+    	good.goodCategory = "bookcategory";
+    	good.quantity = 1;
+    	good.costPerLineItem = BigDecimal.valueOf(12.49);
+    	good.isImported = Boolean.FALSE;
+        Basket basket = new Basket();
+        basket.setGoods(Arrays.asList(new Good[] {good}));
+        given()
+            .body(basket)
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header(ACCEPT, APPLICATION_JSON)
+            .when()
+            .get("/api/invoice")
+            .then()
+            .statusCode(OK.getStatusCode()).log().all();    
+    }
+    
+    
 
     @Test
     void shouldPingOpenAPI() {
