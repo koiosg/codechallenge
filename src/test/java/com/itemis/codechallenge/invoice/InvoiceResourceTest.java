@@ -9,13 +9,20 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import java.util.regex.MatchResult;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.itemis.codechallenge.invoice.conf.TaxConfiguration;
 import com.itemis.codechallenge.invoice.entity.Good;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -121,5 +128,80 @@ public class InvoiceResourceTest {
             .when().get("/q/metrics")
             .then()
             .statusCode(OK.getStatusCode());
+    }
+    
+    @Test
+    void loadAndRunInputFileAsPerCodeChallenge() {
+    	try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("inputs.txt")) {
+    		Scanner sc = new Scanner(inputStream);
+    		java.util.regex.Pattern patternInput = java.util.regex.Pattern.compile("### INPUT:");
+    		java.util.regex.Pattern patternInputN = java.util.regex.Pattern.compile("Input \\d+:");
+			List<Good> goodList = new ArrayList<Good>();
+	    	Basket basket = new Basket();
+	    	if (!sc.hasNextLine()) {
+	    		sc.close();
+	    		return;
+	    	}
+			do {
+    			String lineItem = sc.nextLine();
+    			while (patternInput.matcher(lineItem).find() && sc.hasNextLine() || patternInputN.matcher(lineItem).find() && goodList.isEmpty()) {
+    				lineItem = sc.nextLine();
+    			}
+    			if (patternInputN.matcher(lineItem).find() && !goodList.isEmpty() && sc.hasNextLine()) {
+    		        basket.setGoods(goodList);
+    		        given()
+    	            .body(basket)
+    	            .header(CONTENT_TYPE, APPLICATION_JSON)
+    	            .header(ACCEPT, APPLICATION_JSON)
+    	            .when()
+    	            .get("/api/invoice")
+    	            .then()
+    	            .statusCode(OK.getStatusCode()).log().all();    
+    		        goodList = new ArrayList<Good>();
+    		        basket = new Basket();
+    				lineItem = sc.nextLine();
+    			}
+		    	Scanner lineItemScanner = new Scanner(lineItem);
+		    	lineItemScanner.useDelimiter("$");
+		    	String regexp = "^>\\p{Space}+(\\p{Digit}+)\\p{Space}+"
+		    			+ "([\\p{Alnum}|\\p{Space}]+)\\p{Space}*"
+		    			+ "at\\p{Space}+(\\p{Digit}+[.]\\p{Digit}+)$";
+		    	if (lineItemScanner.hasNext(regexp))
+	    		lineItemScanner.next(regexp);
+		    	MatchResult matcher = lineItemScanner.match();
+		    	String quantity = matcher.group(1);
+		    	String productSpec = matcher.group(2);
+		    	List<String> lst = Arrays.asList(productSpec.split("\\p{Space}"));
+		    	String goodName = (0 < lst.indexOf("of")) ? String.join(" ", lst.subList(lst.indexOf("of") + 1, lst.size())).replace("imported", "").trim() : productSpec.trim(); 
+    		    String cost = matcher.group(3);
+		    	List<Good> taxConfigGoods = TaxConfiguration.getGoods();
+		    	String goodCategory = taxConfigGoods.stream().filter(x->x.name.toString().equalsIgnoreCase(goodName.toString())).findFirst().orElseThrow().goodCategory;
+		    	lineItemScanner.close();
+		    	Good good = new Good().buildQuantity(Integer.valueOf(quantity)).buildName(goodName).buildcostPerLineItem(BigDecimal.
+		    			valueOf(Double.parseDouble(cost))).buildIsImported(1 < lst.size() && productSpec.contains("imported") ? Boolean.TRUE : Boolean.FALSE).buildCategory(goodCategory);
+		    	String UoM = "";
+		    	if (productSpec.matches(".*box.*")) {
+		    		UoM = "box";
+		    	} else if (productSpec.matches(".*bottle.*")) {
+		    		UoM = "bottle";
+		    	} else if (productSpec.matches(".*packet.*")) {
+		    		UoM = "packet";
+		    	} 
+		    	good.buildUnitOfMeasurement(UoM);
+		    	goodList.add(good);
+    		} while (sc.hasNextLine());
+	        basket.setGoods(goodList);
+	        given()
+            .body(basket)
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header(ACCEPT, APPLICATION_JSON)
+            .when()
+            .get("/api/invoice")
+            .then()
+            .statusCode(OK.getStatusCode()).log().all();    
+    		sc.close();
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
     }
 }

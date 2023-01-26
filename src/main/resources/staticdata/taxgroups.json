@@ -19,5 +19,12 @@
 			"basicsalesexcemted",
 			"additionalsalesexcempted"
 		]
+	},
+	{
+		"name": "import_excempted",
+		"taxCategories": [
+			"basicsales",
+			"additionalsalesexcempted"
+		]
 	}
 ]

@@ -3,7 +3,6 @@ package com.itemis.codechallenge.invoice.health;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
@@ -16,15 +15,12 @@ import com.itemis.codechallenge.invoice.entity.TaxGroup;
 @Readiness
 @ApplicationScoped
 public class ConfigurationHealthCheck implements HealthCheck {
-
-	@Inject
-	TaxConfiguration taxConfiguration;
 	
 	@Override
 	public HealthCheckResponse call() {
 		HealthCheckResponseBuilder responseBuilder = HealthCheckResponse.named("Datasource connection health check");
 		
-		List <TaxGroup> taxGroups = taxConfiguration.getTaxGroups();
+		List <TaxGroup> taxGroups = TaxConfiguration.getTaxGroups();
 		if (0 < taxGroups.size()) {
 			responseBuilder.withData("TaxGroups config elements list size", taxGroups.size()).up();
 		}

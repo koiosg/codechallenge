@@ -5,10 +5,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
+@ApplicationScoped
 public class Invoice {
 	public List<InvoiceItem> getInvoiceItems() {
 		return invoiceItems;
@@ -19,8 +21,8 @@ public class Invoice {
 	}
 	
 	public Invoice buildInvoiceItems(final Basket basket) {
-		final ArrayList<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
-		basket.getGoods().parallelStream().forEach(good -> {
+		ArrayList<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
+		basket.getGoods().stream().forEach(good -> {
 				invoiceItems.add(new InvoiceItem().buildQuantity(good.quantity).
 						buildLineItemDescription(good.isImported, good.unitOfMeasurement, good.name).buildLineItemBasicAndAdditionalTax(good.goodCategory, good.costPerLineItem, good.isImported).buildLineItemPrice(good.costPerLineItem));
 		});
@@ -38,8 +40,8 @@ public class Invoice {
 	
 	public Invoice buildSalesTax() {
 		final List<BigDecimal> lineItemTaxAmounts = new ArrayList<BigDecimal>();
-		invoiceItems.parallelStream().forEach(invoiceItem-> lineItemTaxAmounts.add(invoiceItem.getLineItemBasicTax().add(invoiceItem.getLineItemImportTax()))); 
-		setSalesTax(lineItemTaxAmounts.parallelStream().reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_EVEN));
+		invoiceItems.stream().forEach(invoiceItem-> lineItemTaxAmounts.add(invoiceItem.getLineItemBasicTax().add(invoiceItem.getLineItemImportTax()))); 
+		setSalesTax(lineItemTaxAmounts.stream().reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_EVEN));
 		return this;
 	}
 
@@ -52,7 +54,7 @@ public class Invoice {
 	}
 	
 	public Invoice buildTotal() {
-		setTotal(invoiceItems.parallelStream().map(x->x.getLineItemPrice()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_EVEN));
+		setTotal(invoiceItems.stream().map(x->x.getLineItemPrice()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_EVEN));
 		return this;
 	}
 

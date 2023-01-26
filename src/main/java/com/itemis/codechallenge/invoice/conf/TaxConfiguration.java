@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.itemis.codechallenge.invoice.entity.Good;
@@ -14,10 +12,11 @@ import com.itemis.codechallenge.invoice.entity.GoodCategory;
 import com.itemis.codechallenge.invoice.entity.TaxCategory;
 import com.itemis.codechallenge.invoice.entity.TaxGroup;
 
-@ApplicationScoped
 public class TaxConfiguration {
 
-	public List<TaxGroup> getTaxGroups() {
+	public static List<TaxGroup> taxGroups = getTaxGroups();
+	
+	public static List<TaxGroup> getTaxGroups() {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/taxgroups.json")) {
@@ -30,7 +29,9 @@ public class TaxConfiguration {
 		}
 	}
 	
-	public List<TaxCategory> getTaxCategories() {
+	public static List<TaxCategory> taxCategories = getTaxCategories();
+	
+	public static List<TaxCategory> getTaxCategories() {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/taxcategories.json")) {
@@ -43,7 +44,9 @@ public class TaxConfiguration {
 		}
 	}
 	
-	public List<GoodCategory> getGoodCategories() {
+	public static List<GoodCategory> goodCategories = getGoodCategories();
+	
+	public static List<GoodCategory> getGoodCategories() {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/goodscategories.json")) {
@@ -56,7 +59,9 @@ public class TaxConfiguration {
 		}
 	}
 	
-	public List<Good> getGoods() {
+	public static List<Good> goods = getGoods();
+	
+	public static List<Good> getGoods() {
 		// read json file data to String
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("staticdata/goods.json")) {

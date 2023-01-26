@@ -25,10 +25,18 @@
 	},
 	{
 		"name": "musiccategory",
-		"taxGroup": "sales_w_o_excempt"
+		"taxGroup": "import_excempted"
 	},
 	{
 		"name": "perfumcategory",
+		"taxGroup": "import_excempted"
+	},
+	{
+		"name": "musiccategory_import",
+		"taxGroup": "sales_w_o_excempt"
+	},
+	{
+		"name": "perfumcategory_import",
 		"taxGroup": "sales_w_o_excempt"
 	}
 ]

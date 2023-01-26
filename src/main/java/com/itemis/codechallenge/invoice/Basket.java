@@ -10,7 +10,7 @@ public class Basket {
 	
 	@NotNull
 	private List<Good> goods;
-
+	
 	public List<Good> getGoods() {
 		return goods;
 	}

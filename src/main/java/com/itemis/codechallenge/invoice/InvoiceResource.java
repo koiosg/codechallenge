@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,6 +22,9 @@ import org.jboss.logging.Logger;
 @Path("/api/invoice")
 @Produces(APPLICATION_JSON)
 public class InvoiceResource {
+	
+	@Inject
+	InvoiceService invoiceService;
 
     private static final Logger LOGGER = Logger.getLogger(InvoiceResource.class);
 
@@ -30,7 +34,7 @@ public class InvoiceResource {
     public Response getInvoice(
         @RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = Basket.class)))
         @Valid Basket basket) throws IOException {
-		final Invoice invoice = InvoiceService.getInvoice(basket);
+		final Invoice invoice = invoiceService.getInvoice(basket);
         LOGGER.debug("Invoice fetched for a basket " + basket);
         return Response.ok(invoice).build();
     }

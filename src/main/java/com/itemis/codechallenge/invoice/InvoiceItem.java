@@ -14,14 +14,6 @@ import com.itemis.codechallenge.invoice.entity.TaxCategory;
 
 public class InvoiceItem {
 	
-	private static TaxConfiguration taxConfiguration;
-	
-	InvoiceItem() {
-		if (null == taxConfiguration) {
-			taxConfiguration = new TaxConfiguration();
-		}
-	}
-	
 	private static final String IMPORTED_CATEGORY_SUFFIX = "_import";
 	
 	public Integer getQuantity() {
@@ -63,8 +55,8 @@ public class InvoiceItem {
 		if (Boolean.TRUE.equals(isImported)) {
 			this.lineItemDescription = this.getLineItemDescription().concat(" imported");
 		} 
-		if (null != unitOfMeasurement) {
-			this.lineItemDescription = this.getLineItemDescription().concat(unitOfMeasurement).concat(" of");
+		if (null != unitOfMeasurement && !unitOfMeasurement.isEmpty() && !unitOfMeasurement.isBlank()) {
+			this.lineItemDescription = this.getLineItemDescription().concat(" ").concat(unitOfMeasurement).concat(" of");
 		}
 		this.lineItemDescription = this.getLineItemDescription().concat(" ").concat(goodName).concat(": ");
 		return this;
@@ -87,17 +79,20 @@ public class InvoiceItem {
 	}
 
 	public InvoiceItem buildLineItemBasicAndAdditionalTax(final String goodCategory, final BigDecimal costPerLineItem, final Boolean isImported) {
-		final String taxGroupName = taxConfiguration.
-				getGoodCategories().stream().filter
-				(x->x.name.equals(isImported ? goodCategory.concat(IMPORTED_CATEGORY_SUFFIX) : goodCategory)).findFirst().get().taxGroup;
-		final List<String> taxCategoriesPerGroup = taxConfiguration.getTaxGroups().stream().filter(taxConf -> taxConf.getName().equals(taxGroupName)).findFirst().get().getTaxCategories();
+		final String taxGroupName = TaxConfiguration.
+				goodCategories.stream().filter
+				(goodCat->goodCat.name.equals(isImported ? goodCategory.concat(IMPORTED_CATEGORY_SUFFIX) : goodCategory)).
+				findAny().
+				orElseThrow().
+				taxGroup;
+		final List<String> taxCategoriesPerGroup = TaxConfiguration.taxGroups.stream().filter(taxConf -> taxConf.getName().equals(taxGroupName)).findFirst().get().getTaxCategories();
 		final String basicTaxCategoryName = taxCategoriesPerGroup.get(0);
-		TaxCategory basicTaxCategory = taxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(basicTaxCategoryName)).findFirst().get();
+		TaxCategory basicTaxCategory = TaxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(basicTaxCategoryName)).findFirst().get();
 		final BigDecimal basicTaxPersPerCategory = 0 < basicTaxCategory.getExcemptpers().longValueExact() ? 
 				basicTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).add(basicTaxCategory.getTaxpers().divide(basicTaxCategory.getExcemptpers()).negate()) : basicTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
 		this.lineItemBasicTax = costPerLineItem.multiply(basicTaxPersPerCategory);
 		final String additionalTaxCategoryName = taxCategoriesPerGroup.get(1);
-		TaxCategory additionalTaxCategory = taxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(additionalTaxCategoryName)).findFirst().get();
+		TaxCategory additionalTaxCategory = TaxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(additionalTaxCategoryName)).findFirst().get();
 		final BigDecimal additionalTaxPersPerCategory = 0 < additionalTaxCategory.getExcemptpers().longValueExact() ? 
 				additionalTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).add(additionalTaxCategory.getTaxpers().divide(additionalTaxCategory.getExcemptpers()).negate()) : additionalTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
 		this.lineItemImportTax = costPerLineItem.multiply(additionalTaxPersPerCategory);
