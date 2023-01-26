@@ -14,6 +14,8 @@ In order to demonstrate how application run as per code challenge, i.e. reading 
 ./mvnw quarkus:test
 ```
 where test/dev/prod are available quarkus execution profiles (supported by Eclipse microprofile as being a part of Quarkus microservices ecosystem).
+basket items (as per PDF shared by Itemis for a salestax task) are located in the original form under src\main\resources\inputs.txt and loaded from there.
+File can be changed and test can be rerun (I hope so :) )
 
 Screenshot of successful run in a bash terminal is located under doc subfolder in a repo: RunningTestsBash_screen.png
 Screenshot of successful run from inside Eclipse is located under doc subfolder in a repo: InvoicePrintOut_JUnit.png
