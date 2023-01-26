@@ -26,6 +26,8 @@ import com.itemis.codechallenge.invoice.conf.TaxConfiguration;
 import com.itemis.codechallenge.invoice.entity.Good;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -83,7 +85,7 @@ public class InvoiceResourceTest {
             .when()
             .get("/api/invoice")
             .then()
-            .statusCode(OK.getStatusCode()).log().all();    
+            .statusCode(OK.getStatusCode());    
     }
     
     
@@ -142,7 +144,10 @@ public class InvoiceResourceTest {
 	    		sc.close();
 	    		return;
 	    	}
-			do {
+	    	Response response = null;
+	    	Integer basketCount = 1;
+			System.out.println("### OUTPUT");
+	    	do {
     			String lineItem = sc.nextLine();
     			while (patternInput.matcher(lineItem).find() && sc.hasNextLine() || patternInputN.matcher(lineItem).find() && goodList.isEmpty()) {
     				lineItem = sc.nextLine();
@@ -156,7 +161,24 @@ public class InvoiceResourceTest {
     	            .when()
     	            .get("/api/invoice")
     	            .then()
-    	            .statusCode(OK.getStatusCode()).log().all();    
+    	            .statusCode(OK.getStatusCode());
+    		        response = given()
+    	            .body(basket)
+    	            .header(CONTENT_TYPE, APPLICATION_JSON)
+    	            .header(ACCEPT, APPLICATION_JSON)
+    	            .when()
+    	            .get("/api/invoice");
+    				System.out.println("Output " + basketCount++ + ":");
+    				System.out.println();
+    		        //convert JSON to string
+    		        JsonPath jsonString = new JsonPath(response.asString());
+    		        int listSize = jsonString.getInt("invoiceItems.size()");
+    		        for(int i = 0; i < listSize; i++) {
+    		        	System.out.println("> " + jsonString.getString("invoiceItems["+i+"].lineItemDescription") + " " + BigDecimal.valueOf(jsonString.getDouble("invoiceItems["+i+"].lineItemPrice")).setScale(2));    		              		        	
+    		        }
+    		        System.out.println("> Sales Taxes: " + BigDecimal.valueOf(jsonString.getDouble("salesTax")).setScale(2));
+    		        System.out.println("> Total: " + BigDecimal.valueOf(jsonString.getDouble("total")).setScale(2));
+    		        System.out.println();
     		        goodList = new ArrayList<Good>();
     		        basket = new Basket();
     				lineItem = sc.nextLine();
@@ -191,14 +213,22 @@ public class InvoiceResourceTest {
 		    	goodList.add(good);
     		} while (sc.hasNextLine());
 	        basket.setGoods(goodList);
-	        given()
-            .body(basket)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .header(ACCEPT, APPLICATION_JSON)
-            .when()
-            .get("/api/invoice")
-            .then()
-            .statusCode(OK.getStatusCode()).log().all();    
+	        response = given()
+    	            .body(basket)
+    	            .header(CONTENT_TYPE, APPLICATION_JSON)
+    	            .header(ACCEPT, APPLICATION_JSON)
+    	            .when()
+    	            .get("/api/invoice");
+    		System.out.println("Output " + basketCount + ":");
+    		System.out.println();
+    		//convert JSON to string
+    		JsonPath jsonString = new JsonPath(response.asString());
+    		int listSize = jsonString.getInt("invoiceItems.size()");
+    		for(int i = 0; i < listSize; i++) {
+    			System.out.println("> " + jsonString.getString("invoiceItems["+i+"].lineItemDescription") + " " + BigDecimal.valueOf(jsonString.getDouble("invoiceItems["+i+"].lineItemPrice")).setScale(2));    		              		        	
+    		}
+            System.out.println("> Sales Taxes: " + BigDecimal.valueOf(jsonString.getDouble("salesTax")).setScale(2));
+ 	        System.out.println("> Total: " + BigDecimal.valueOf(jsonString.getDouble("total")).setScale(2));    
     		sc.close();
     	} catch (IOException e) {
     		e.printStackTrace();

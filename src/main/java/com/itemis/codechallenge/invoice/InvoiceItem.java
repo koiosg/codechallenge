@@ -80,22 +80,18 @@ public class InvoiceItem {
 
 	public InvoiceItem buildLineItemBasicAndAdditionalTax(final String goodCategory, final BigDecimal costPerLineItem, final Boolean isImported) {
 		final String taxGroupName = TaxConfiguration.
-				goodCategories.stream().filter
-				(goodCat->goodCat.name.equals(isImported ? goodCategory.concat(IMPORTED_CATEGORY_SUFFIX) : goodCategory)).
-				findAny().
-				orElseThrow().
-				taxGroup;
+				goodCategories.stream().filter(goodCat->goodCat.name.equals(isImported ? goodCategory.concat(IMPORTED_CATEGORY_SUFFIX) : goodCategory)).findAny().orElseThrow().taxGroup;
 		final List<String> taxCategoriesPerGroup = TaxConfiguration.taxGroups.stream().filter(taxConf -> taxConf.getName().equals(taxGroupName)).findFirst().get().getTaxCategories();
 		final String basicTaxCategoryName = taxCategoriesPerGroup.get(0);
 		TaxCategory basicTaxCategory = TaxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(basicTaxCategoryName)).findFirst().get();
 		final BigDecimal basicTaxPersPerCategory = 0 < basicTaxCategory.getExcemptpers().longValueExact() ? 
 				basicTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).add(basicTaxCategory.getTaxpers().divide(basicTaxCategory.getExcemptpers()).negate()) : basicTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
-		this.lineItemBasicTax = costPerLineItem.multiply(basicTaxPersPerCategory);
+		this.lineItemBasicTax = costPerLineItem.multiply(basicTaxPersPerCategory).multiply(BigDecimal.valueOf(20)).setScale(0, RoundingMode.CEILING).divide(BigDecimal.valueOf(20)).setScale(2, RoundingMode.HALF_EVEN);
 		final String additionalTaxCategoryName = taxCategoriesPerGroup.get(1);
 		TaxCategory additionalTaxCategory = TaxConfiguration.getTaxCategories().stream().filter(taxCat->taxCat.getName().equals(additionalTaxCategoryName)).findFirst().get();
 		final BigDecimal additionalTaxPersPerCategory = 0 < additionalTaxCategory.getExcemptpers().longValueExact() ? 
 				additionalTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100)).add(additionalTaxCategory.getTaxpers().divide(additionalTaxCategory.getExcemptpers()).negate()) : additionalTaxCategory.getTaxpers().divide(BigDecimal.valueOf(100));
-		this.lineItemImportTax = costPerLineItem.multiply(additionalTaxPersPerCategory);
+		this.lineItemImportTax = costPerLineItem.multiply(additionalTaxPersPerCategory).multiply(BigDecimal.valueOf(20)).setScale(0, RoundingMode.CEILING).divide(BigDecimal.valueOf(20)).setScale(2, RoundingMode.HALF_EVEN);
 		return this;
 	}
 	
