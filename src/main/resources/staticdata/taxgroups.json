@@ -1,14 +1,30 @@
 [
 	{
 		"name": "sales_w_o_excempt",
-		"taxCategories" : [
-			"basicsales","additionalsales"
+		"taxCategories": [
+			"basicsales",
+			"additionalsales"
 		]
 	},
 	{
 		"name": "sales_with_excempt",
-		"taxCategories" : [
-			"basicsalesexcemted","additionalsales"
+		"taxCategories": [
+			"basicsalesexcemted",
+			"additionalsales"
+		]
+	},
+	{
+		"name": "excempted",
+		"taxCategories": [
+			"basicsalesexcemted",
+			"additionalsalesexcempted"
+		]
+	},
+	{
+		"name": "import_excempted",
+		"taxCategories": [
+			"basicsales",
+			"additionalsalesexcempted"
 		]
 	}
 ]

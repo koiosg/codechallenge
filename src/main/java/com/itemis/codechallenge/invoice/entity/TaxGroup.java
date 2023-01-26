@@ -28,7 +28,6 @@ public class TaxGroup {
 	private String name;
 	
 	@NotNull
-    @Pattern(regexp = "basicsales|additionalsales", flags = Pattern.Flag.CASE_INSENSITIVE)
 	List<String> taxCategories;
 }
  	

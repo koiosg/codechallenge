@@ -3,6 +3,8 @@ package com.itemis.codechallenge.invoice;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.GET;
@@ -20,19 +22,19 @@ import org.jboss.logging.Logger;
 @Path("/api/invoice")
 @Produces(APPLICATION_JSON)
 public class InvoiceResource {
+	
+	@Inject
+	InvoiceService invoiceService;
 
     private static final Logger LOGGER = Logger.getLogger(InvoiceResource.class);
-
-    @Inject
-    InvoiceService service;
 
     @Operation(summary = "Fetch Invoice details for a basket")
     @APIResponse(responseCode = "200", description = "Invoice details", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = Invoice.class)))
     @GET
     public Response getInvoice(
         @RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = Basket.class)))
-        @Valid Basket basket) {
-        Invoice invoice = service.getInvoice(basket);
+        @Valid Basket basket) throws IOException {
+		final Invoice invoice = invoiceService.getInvoice(basket);
         LOGGER.debug("Invoice fetched for a basket " + basket);
         return Response.ok(invoice).build();
     }
@@ -43,4 +45,6 @@ public class InvoiceResource {
     public String hello() {
         return "hello";
     }
+    
+    
 }

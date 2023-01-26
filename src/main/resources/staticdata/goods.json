@@ -4,20 +4,20 @@
 		"goodCategory": "bookcategory"
 	},
 	{
-		"name": "food",
-		"goodCategory": "foodcategory"
-	},
-	{
-		"name": "medical",
+		"name": "headache pills",
 		"goodCategory": "medicalcategory"
 	},
 	{
-		"name": "music",
+		"name": "music CD",
 		"goodCategory": "musiccategory"
 	},
 	{
-		"name": "sweets",
-		"goodCategory": "chocolatecategory"
+		"name": "chocolates",
+		"goodCategory": "foodcategory"
+	},
+	{
+		"name": "chocolate bar",
+		"goodCategory": "foodcategory"
 	},
 	{
 		"name": "perfume",

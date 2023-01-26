@@ -1,26 +1,42 @@
  [
 	{
 		"name": "bookcategory",
-		"taxGroup": "sales_with_excempt"
+		"taxGroup": "excempted"
 	},
 	{
 		"name": "foodcategory",
-		"taxGroup": "sales_with_excempt"
+		"taxGroup": "excempted"
 	},
 	{
 		"name": "medicalcategory",
+		"taxGroup": "excempted"
+	},
+	{
+		"name": "bookcategory_import",
+		"taxGroup": "sales_with_excempt"
+	},
+	{
+		"name": "foodcategory_import",
+		"taxGroup": "sales_with_excempt"
+	},
+	{
+		"name": "medicalcategory_import",
 		"taxGroup": "sales_with_excempt"
 	},
 	{
 		"name": "musiccategory",
-		"taxGroup": "sales_w_o_excempt"
-	},
-	{
-		"name": "chocolatecategory",
-		"taxGroup": "sales_w_o_excempt"
+		"taxGroup": "import_excempted"
 	},
 	{
 		"name": "perfumcategory",
+		"taxGroup": "import_excempted"
+	},
+	{
+		"name": "musiccategory_import",
+		"taxGroup": "sales_w_o_excempt"
+	},
+	{
+		"name": "perfumcategory_import",
 		"taxGroup": "sales_w_o_excempt"
 	}
 ]
